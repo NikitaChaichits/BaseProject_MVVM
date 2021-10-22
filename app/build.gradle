@@ -1,0 +1,124 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: "androidx.navigation.safeargs"
+
+android {
+
+    flavorDimensions "mode"
+    compileSdkVersion globalConfig.compileSdkVersion
+    buildToolsVersion globalConfig.buildToolsVersion
+
+    defaultConfig {
+        applicationId appConfig.applicationId
+        minSdkVersion globalConfig.minSdkVersion
+        targetSdkVersion globalConfig.targetSdkVersion
+        versionCode appConfig.versionCode
+        versionName appConfig.versionName
+    }
+
+    signingConfigs {
+        release {
+            keyAlias appConfig.keyAlias
+            keyPassword appConfig.keyPassword
+            storeFile appConfig.storeFile
+            storePassword appConfig.storePassword
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            debuggable true
+            minifyEnabled false
+            shrinkResources false
+            applicationIdSuffix ".debug"
+        }
+    }
+
+    productFlavors {
+        production {
+            buildConfigField("String", "BASE_URL", '"' + dataConfig.prodUrl + '"')
+        }
+        development {
+            applicationIdSuffix ".dev"
+            buildConfigField "boolean", "USE_DEVELOPER_OPTIONS", "true"
+            buildConfigField("String", "BASE_URL", '"' + dataConfig.devUrl + '"')
+        }
+        developmentWithMock {
+            applicationIdSuffix ".dev"
+            buildConfigField "boolean", "USE_DEVELOPER_OPTIONS", "true"
+            buildConfigField "boolean", "USE_MOCKED_DATA", "true"
+            buildConfigField("String", "BASE_URL", '"' + dataConfig.devUrl + '"')
+        }
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+
+    // Data layer
+    implementation globalDependencies.layerData
+
+    // Common
+    implementation appDependencies.constraintLayout
+    implementation appDependencies.recyclerView
+    implementation appDependencies.lifecycleViewmodelKtx
+    implementation appDependencies.lifecycleLivedataKtx
+    implementation appDependencies.lifecycleJava8
+    implementation appDependencies.lifecycleRuntime
+    implementation appDependencies.legacySupportV4
+    implementation appDependencies.cardView
+    implementation appDependencies.navigationFragmentKtx
+    implementation appDependencies.navigationUiKtx
+    implementation appDependencies.activityKtx
+    implementation appDependencies.fragmentKtx
+    implementation appDependencies.glideBase
+    implementation appDependencies.glideAnnotations
+    implementation appDependencies.glideCompiler
+
+    // Material design system
+    implementation appDependencies.material
+
+    // Material dialogs
+    implementation appDependencies.materialDialogsCore
+    implementation appDependencies.materialDialogsLifecycle
+
+    // View Binding property buster
+    implementation appDependencies.viewBindingPropertyDelegate
+
+    // DI
+    kapt globalDependencies.daggerCompiler
+
+    // WorkManager with coroutines
+    implementation appDependencies.coroutineWorkManager
+
+    // CameraX and QR scanner
+    implementation appDependencies.camerax
+    implementation appDependencies.cameraxLifecycle
+    implementation appDependencies.cameraxView
+    implementation appDependencies.barcodeScanning
+
+}
+
+android.applicationVariants.all { variant ->
+    variant.resValue "string", "app_version", "${appConfig.versionName} (${appConfig.build})"
+    variant.outputs.all { outputFileName = "${variant.name}-v${variant.versionCode}.apk" }
+}

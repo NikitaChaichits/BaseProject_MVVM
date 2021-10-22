@@ -1,0 +1,50 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-parcelize'
+
+android {
+
+    compileSdkVersion globalConfig.compileSdkVersion
+    buildToolsVersion globalConfig.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion globalConfig.minSdkVersion
+        targetSdkVersion globalConfig.targetSdkVersion
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            debuggable true
+            minifyEnabled false
+        }
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+
+    // Common
+    implementation globalDependencies.coreKtx
+
+    // Kotlin Coroutines
+    api domainDependencies.coroutinesCore
+    api domainDependencies.coroutinesAndroid
+
+    // LeakCanary
+    debugApi domainDependencies.leakCanary
+
+    // DI
+    api globalDependencies.dagger
+}

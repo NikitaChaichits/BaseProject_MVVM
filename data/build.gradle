@@ -1,0 +1,68 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+
+    flavorDimensions "mode"
+    compileSdkVersion globalConfig.compileSdkVersion
+    buildToolsVersion globalConfig.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion globalConfig.minSdkVersion
+        targetSdkVersion globalConfig.targetSdkVersion
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += [
+                        "room.schemaLocation"  : "$projectDir/schemas".toString(),
+                        "room.incremental"     : "true",
+                        "room.expandProjection": "true"]
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            debuggable true
+            minifyEnabled false
+        }
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+
+    // Domain layer
+    api globalDependencies.layerDomain
+
+    // Gson
+    implementation dataDependencies.gson
+
+    // Retrofit2
+    api dataDependencies.retrofit
+    api dataDependencies.retrofitConverterGson
+
+    // OkHttp3
+    api dataDependencies.okHttp
+    api dataDependencies.okHttpLoggingInterceptor
+    
+    // room
+    api dataDependencies.roomKtx
+    kapt dataDependencies.roomCompiler
+
+    // Library for EncryptedSharedPreferences
+    implementation dataDependencies.securityCrypto
+}
